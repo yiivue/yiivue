@@ -534,3 +534,303 @@ Avoid:
 - putting API logic in `SpaController`
 
 If you follow that pattern, you can create as many controllers and models as you want while still staying clean, scalable, and aligned with MVC.
+
+## 24. RBAC In This Project
+
+Yes, RBAC should be added the regular Yii2 way.
+
+The difference in this project is only where you use it:
+
+- Yii enforces RBAC on the backend
+- Vue can read permissions for UI convenience
+- real authorization must always stay in Yii
+
+That means:
+
+- Vue may hide buttons like `Edit`, `Delete`, `Publish`
+- Yii must still block the request if the user does not have permission
+
+Never rely on Vue alone for security.
+
+## 25. Recommended RBAC Setup
+
+For this project, use:
+
+- `yii\rbac\DbManager`
+
+This is the standard database-backed Yii2 RBAC setup and is the best fit for a growing app with multiple models, controllers, roles, and permissions.
+
+## 26. Add `authManager`
+
+In `common/config/main.php`, add `authManager` to `components`.
+
+Example:
+
+```php
+'components' => [
+    'cache' => [
+        'class' => \yii\caching\FileCache::class,
+    ],
+    'authManager' => [
+        'class' => \yii\rbac\DbManager::class,
+    ],
+],
+```
+
+This makes RBAC available throughout the app using:
+
+```php
+Yii::$app->authManager
+```
+
+## 27. Create The RBAC Tables
+
+After adding `DbManager`, run Yii's RBAC migration:
+
+```bash
+php yii migrate --migrationPath=@yii/rbac/migrations
+```
+
+This creates the RBAC tables used by Yii:
+
+- roles
+- permissions
+- rule assignments
+- user-role assignments
+
+## 28. How To Create Roles And Permissions
+
+You have two good options:
+
+- create them in a custom console command
+- create them in your own migration or seed-style setup
+
+For most teams, using a console command or a dedicated initialization script is easier to maintain.
+
+Typical examples:
+
+- roles: `admin`, `editor`, `manager`
+- permissions: `viewPosts`, `managePosts`, `manageUsers`
+
+Example setup:
+
+```php
+$auth = Yii::$app->authManager;
+
+$viewPosts = $auth->createPermission('viewPosts');
+$viewPosts->description = 'View posts';
+$auth->add($viewPosts);
+
+$managePosts = $auth->createPermission('managePosts');
+$managePosts->description = 'Create, update, and delete posts';
+$auth->add($managePosts);
+
+$admin = $auth->createRole('admin');
+$auth->add($admin);
+$auth->addChild($admin, $viewPosts);
+$auth->addChild($admin, $managePosts);
+
+$editor = $auth->createRole('editor');
+$auth->add($editor);
+$auth->addChild($editor, $viewPosts);
+
+$auth->assign($admin, 1);
+```
+
+## 29. Where To Enforce RBAC
+
+In this project, enforce RBAC in Yii API controllers.
+
+Do not enforce real authorization in:
+
+- Vue router alone
+- Vue components alone
+- `SpaController`
+
+Good places to enforce RBAC:
+
+- `checkAccess()` in REST controllers
+- `beforeAction()`
+- custom service methods
+- explicit `Yii::$app->user->can(...)` checks inside actions
+
+## 30. RBAC With `ActiveController`
+
+If your controller uses:
+
+- `yii\rest\ActiveController`
+
+Then the best place to enforce permissions is usually:
+
+- `checkAccess($action, $model = null, $params = [])`
+
+Example:
+
+```php
+<?php
+
+namespace frontend\controllers\api;
+
+use Yii;
+use common\models\Post;
+use yii\rest\ActiveController;
+use yii\web\ForbiddenHttpException;
+
+class PostController extends ActiveController
+{
+    public $modelClass = Post::class;
+
+    public function checkAccess($action, $model = null, $params = [])
+    {
+        if (in_array($action, ['index', 'view'], true)) {
+            if (!Yii::$app->user->can('viewPosts')) {
+                throw new ForbiddenHttpException('You are not allowed to view posts.');
+            }
+        }
+
+        if (in_array($action, ['create', 'update', 'delete'], true)) {
+            if (!Yii::$app->user->can('managePosts')) {
+                throw new ForbiddenHttpException('You are not allowed to modify posts.');
+            }
+        }
+    }
+}
+```
+
+This is the cleanest standard Yii2 approach for REST CRUD authorization.
+
+## 31. RBAC With Custom REST Controllers
+
+If your controller uses:
+
+- `yii\rest\Controller`
+
+Then you usually check permissions manually inside actions or in `beforeAction()`.
+
+Example:
+
+```php
+if (!Yii::$app->user->can('manageUsers')) {
+    throw new \yii\web\ForbiddenHttpException('Forbidden.');
+}
+```
+
+This is useful for:
+
+- login-related logic
+- reports
+- dashboards
+- custom workflows
+- multi-model business actions
+
+## 32. Suggested Permission Naming
+
+Use clear permission names based on business actions.
+
+Good examples:
+
+- `viewPosts`
+- `managePosts`
+- `viewUsers`
+- `manageUsers`
+- `publishPosts`
+- `viewDashboard`
+
+Keep naming consistent.
+
+Avoid mixing too many styles like:
+
+- `post.update`
+- `edit_post`
+- `managePosts`
+
+Pick one convention and use it everywhere.
+
+For this project, action-based names like `managePosts` are simple and readable.
+
+## 33. RBAC And Vue
+
+Vue can use permissions for UI behavior, but only as a convenience layer.
+
+Example use cases in Vue:
+
+- hide `Delete` button if user lacks `managePosts`
+- disable `Publish` button if user lacks `publishPosts`
+- hide admin menu items if user lacks `viewDashboard`
+
+To support this, you can expose the authenticated user's permissions through an API such as:
+
+- `/api/me`
+
+That endpoint can return:
+
+- user info
+- roles
+- permissions
+
+But even if Vue hides the button, the API controller must still reject unauthorized requests.
+
+## 34. RBAC And JWT
+
+This project already uses JWT-based auth for API access.
+
+That means the normal flow is:
+
+1. user logs in
+2. Vue stores the token
+3. Vue sends `Authorization: Bearer <token>`
+4. Yii authenticates the user
+5. Yii checks RBAC with `Yii::$app->user->can(...)`
+
+So RBAC still works in the normal Yii way after authentication is resolved.
+
+JWT does not replace RBAC.
+JWT only identifies the user making the request.
+RBAC decides what that user is allowed to do.
+
+## 35. Best Long-Term Pattern For This Repo
+
+As your API grows, a good pattern is:
+
+- use `DbManager`
+- seed roles and permissions from console or migrations
+- create a shared base API controller for common behaviors
+- enforce CRUD permissions in `checkAccess()`
+- enforce custom permissions with `can()` checks
+
+This gives you clean separation:
+
+- authentication with JWT
+- authorization with RBAC
+- frontend UI with Vue
+
+## 36. Common RBAC Mistakes To Avoid
+
+- checking permissions only in Vue
+- putting RBAC checks in `SpaController`
+- skipping backend `can()` checks because the menu is hidden already
+- hardcoding admin-only logic everywhere instead of using permissions
+- not seeding roles and permissions consistently between environments
+
+## 37. RBAC Checklist
+
+When adding RBAC to this project, follow this order:
+
+- add `authManager` with `yii\rbac\DbManager`
+- run the RBAC migration
+- create roles and permissions
+- assign roles to users
+- enforce permissions in API controllers
+- optionally expose permissions to Vue for UI behavior
+
+## 38. Final RBAC Rule Of Thumb
+
+Use RBAC the normal Yii2 way.
+
+In this project:
+
+- JWT answers: who is the user?
+- RBAC answers: what can the user do?
+- Vue answers: what should the UI show?
+
+That separation is the cleanest and safest approach.
