@@ -28,14 +28,14 @@ This project uses `vlucas/phpdotenv` to manage environment variables. This allow
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
-   cd recreate-pmis-clean-codes
+   git clone https://github.com/yiivue/yiivue.git
+   cd yiivue
    ```
 
 2. **Initialize the application:**
    This sets up the local environment files. Choose `Development` for local work.
    ```bash
-   ./init
+   php yii init
    ```
 
 3. **Spin up Docker:**
@@ -50,8 +50,7 @@ This project uses `vlucas/phpdotenv` to manage environment variables. This allow
 
 5. **Install NPM dependencies:**
    ```bash
-   npm install
-   npm run dev
+   composer run setup
    ```
 
 6. **Access the App:**
@@ -62,11 +61,10 @@ This project uses `vlucas/phpdotenv` to manage environment variables. This allow
 
 ##  Manual Setup (Non-Docker)
 
-1. **Composer Install:** `composer install`
-2. **Init:** `./init`
+1. **Composer Install:** `composer run setup`
+2. **Init:** `php yii init`
 3. **Configure DB:** Update `common/config/main-local.php` with your database credentials.
 4. **Migrate:** `php yii migrate`
-5. **NPM Install:** `npm install`
 6. **Build/Run:** `npm run dev` or `npm run build`
 
 ---
