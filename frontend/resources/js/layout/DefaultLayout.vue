@@ -27,7 +27,6 @@ function isLinkActive(path) {
         </router-link>
 
         <nav class="hidden md:flex items-center gap-8">
-          <!-- <a href="https://yiivue.zcreations.xyz/" target="_blank" rel="noopener noreferrer" class="text-xs font-bold uppercase tracking-wider transition-colors">Docs</a> -->
           <router-link to="/login" class="text-xs font-bold uppercase tracking-wider transition-colors"
             :class="isLinkActive('/login') ? 'text-[#1b75bb]' : 'text-gray-500 hover:text-[#1b75bb]'">Login</router-link>
           

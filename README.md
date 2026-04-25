@@ -35,7 +35,7 @@ This project uses `vlucas/phpdotenv` to manage environment variables. This allow
 2. **Initialize the application:**
    This sets up the local environment files. Choose `Development` for local work.
    ```bash
-   php yii init
+   php init
    ```
 
 3. **Spin up Docker:**
@@ -62,7 +62,7 @@ This project uses `vlucas/phpdotenv` to manage environment variables. This allow
 ##  Manual Setup (Non-Docker)
 
 1. **Composer Install:** `composer run setup`
-2. **Init:** `php yii init`
+2. **Init:** `php init`
 3. **Configure DB:** Update `common/config/main-local.php` with your database credentials.
 4. **Migrate:** `php yii migrate`
 6. **Build/Run:** `npm run dev` or `npm run build`
@@ -96,9 +96,9 @@ This project uses `vlucas/phpdotenv` to manage environment variables. This allow
 ##  Using as a Composer Template
 If you want to use this as a base for new projects:
 1. **Host it on Git:** Push this repository to your GitHub/GitLab.
-2. **Install via Composer:**
+2. **Install via Composer: (NOT YET AVAILABLE, HOWEVER YOU CAN CLONE IT)**
    ```bash
-   composer create-project your-username/yii2-vue-spa-template new-project
+   composer create-project yiivue/yiivue new-project
    ```
 3. **Configure `composer.json`:** Update the `name`, `description`, and `authors` fields in your new project.
 
