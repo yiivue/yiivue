@@ -6,13 +6,19 @@ import DashboardLayout from './layout/DashboardLayout.vue'
 import Home from './pages/Home.vue'
 import Login from './pages/auth/Login.vue'
 import Register from './pages/auth/Register.vue'
-import Documentation from './pages/Documentation.vue'
 
 // Dashboard pages (use DashboardLayout)
 import DashboardHome from './pages/admin/Dashboard.vue'
 import Profile from './pages/admin/Profile.vue'
 import Settings from './pages/admin/Settings.vue'
 import { isAuthenticated } from '@/lib/auth'
+
+const DOCS_URL = 'https://yiivue.zcreations.xyz/'
+
+function openDocumentation() {
+    window.open(DOCS_URL, '_blank', 'noopener')
+    return false
+}
 
 const routes = [
     {
@@ -24,10 +30,10 @@ const routes = [
             { path: 'register', component: Register },
             { 
                 path: 'documentation', 
-                component: Documentation,
+                beforeEnter: openDocumentation,
                 meta: {
                     title: 'Documentation',
-                    description: 'Learn how to setup and use this project.',
+                    description: 'Open the external YiiVue documentation.',
                 }
             },
         ]
@@ -67,10 +73,10 @@ const routes = [
             },
             {
                 path: 'documentation',
-                component: Documentation,
+                beforeEnter: openDocumentation,
                 meta: {
                     title: 'Documentation',
-                    description: 'Technical guide and setup instructions.',
+                    description: 'Open the external YiiVue documentation.',
                 },
             },
         ]

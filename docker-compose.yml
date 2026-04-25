@@ -9,7 +9,7 @@ services:
       VITE_DEV_SERVER_URL: http://localhost:5173
       VITE_DEV_SERVER_INTERNAL_URL: http://node:5173
     ports:
-      - "9001:80"
+      - "9000:80"
     volumes:
       - ./:/var/www/html
       - ./docker-vhost.conf:/etc/apache2/sites-available/000-default.conf

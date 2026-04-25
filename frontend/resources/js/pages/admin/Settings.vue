@@ -17,7 +17,7 @@
                     </div>
                     
                     <div class="pt-4">
-                        <Button type="submit" class="bg-[#FF2D20] hover:bg-[#e0261b] text-white px-8 h-11 font-bold uppercase text-xs tracking-widest rounded-xl shadow-lg shadow-[#FF2D20]/20">
+                        <Button type="submit" class="bg-[#1b75bb] hover:bg-[#185b8f] text-white px-8 h-11 font-bold uppercase text-xs tracking-widest rounded-xl shadow-lg shadow-[#185b8f]/20">
                             Save Preferences
                         </Button>
                     </div>

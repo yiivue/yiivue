@@ -43,7 +43,7 @@ $useProductionBuild = !$useViteDevServer && is_file($productionJsPath);
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Vue SPA</title>
+    <title>YiiVue</title>
     <?php if ($useProductionBuild && is_file($productionCssPath)): ?>
         <link rel="stylesheet" href="<?= Html::encode($productionCssUrl) ?>">
     <?php endif; ?>
