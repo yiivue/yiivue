@@ -16,7 +16,7 @@
         </h1>
 
         <p class="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl leading-relaxed">
-          The ultimate single-page application boilerplate for Personnel Management.
+          The ultimate single-page application boilerplate.
           Engineered with <strong>Yii2</strong> for industrial-grade stability and <strong>Vue 3</strong> for a seamless
           user experience.
         </p>
